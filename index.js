@@ -13,6 +13,7 @@ const pool = new Pool({
     password: "1234",
     port: 5432,
 });
+
 app.post("/locations", async (req, res) => {
     try {
         const { nom_loc, design_voiture, nombre_jours, taux_journalier } = req.body;
@@ -29,9 +30,35 @@ app.post("/locations", async (req, res) => {
     }
 });
 
+app.post("/utilisateurs", async (req, res) => {
+    try {
+        const { nom,telephone,adresse } = req.body;
+
+        const result = await pool.query(
+            `INSERT INTO utilisateur (nom,telephone,adresse)
+       VALUES ($1, $2, $3) RETURNING *`,
+            [nom,telephone,adresse]
+        );
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
 app.get("/locations", async (req, res) => {
     try {
         const result = await pool.query("SELECT * FROM location");
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+
+app.get("/utilisateurs", async (req, res) => {
+    try {
+        const result = await pool.query("SELECT * FROM utilisateur");
         res.json(result.rows);
     } catch (err) {
         console.error(err.message);
